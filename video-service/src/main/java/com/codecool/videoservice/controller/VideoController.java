@@ -40,4 +40,13 @@ public class VideoController {
         List<Video> videos = videoRepo.findAll();
         return restAssembler.toCollectionModel(videos);
     }
+
+    @GetMapping(value = "/video/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public EntityModel<Video> handleGetOneVideo(
+            @PathVariable
+            Long id
+    ) {
+        Video videoForId = videoRepo.findById(id).orElseThrow(() -> new VideoNotFoundException(id));
+        return restAssembler.toModel(videoForId);
+    }
 }
