@@ -1,0 +1,9 @@
+# IntelliJ/IDEA
+.idea/
+
+# Visual Studio
+.vscode/
+
+
+# Temporary folder
+temp/
