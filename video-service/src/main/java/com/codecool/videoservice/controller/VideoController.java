@@ -7,11 +7,11 @@ import com.codecool.videoservice.representation.VideoModelAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +46,22 @@ public class VideoController {
             @PathVariable
             Long id
     ) {
+        //TODO call Video Recommendation Service to also return recommendation data for this id
         Video videoForId = videoRepo.findById(id).orElseThrow(() -> new VideoNotFoundException(id));
         return restAssembler.toModel(videoForId);
+    }
+
+    // POST to a collection route creates a new item in the collection
+    @PostMapping(value ="/videos", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> handleNewVideoPost(
+            @RequestBody
+            Video someVideo
+    ) {
+        //TODO call Video Recommendation Service to POST recommendation data
+        EntityModel<Video> entityModel = restAssembler.toModel(videoRepo.save(someVideo));
+
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
     }
 }
