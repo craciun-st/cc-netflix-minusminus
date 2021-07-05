@@ -64,4 +64,32 @@ public class VideoController {
                 .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
                 .body(entityModel);
     }
+
+    // PUT to an item route replaces the item in the collection (if it exists), otherwise creates it (if possible)
+    @PutMapping(value = "/video/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> handleReplacingOneVideo(
+            @RequestBody
+            Video someVideo,
+
+            @PathVariable
+            Long id
+    ) {
+        //TODO call Video Recommendation Service to PUT recommendation data there
+        Video updatedVideo = videoRepo.findById(id)
+                .map(video -> {
+                    video.setName(someVideo.getName());
+                    video.setUrl(someVideo.getUrl());
+                    return videoRepo.save(video);
+                })
+                .orElseGet( () -> {
+                            someVideo.setId(id);
+                            return videoRepo.save(someVideo);
+                        }
+                );
+        EntityModel<Video> entityModel = restAssembler.toModel(updatedVideo);
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(entityModel);
+    }
+
 }
